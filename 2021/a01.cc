@@ -24,7 +24,10 @@ using namespace std;
 
 namespace x {
 
-template <typename T> T to(string_view from) {
+template<typename T>
+T
+to(string_view from)
+{
   T r{};
   if (auto [p, ec] = from_chars(from.data(), from.data() + from.size(), r);
       p != from.data() + from.size()) {
@@ -35,7 +38,9 @@ template <typename T> T to(string_view from) {
   return r;
 }
 
-vector<string_view> split(string_view sv, string_view delimiters = ", "sv) {
+vector<string_view>
+split(string_view sv, string_view delimiters = ", "sv)
+{
   vector<string_view> parts;
   while (!sv.empty()) {
     auto p = sv.find_first_of(delimiters);
@@ -49,7 +54,11 @@ vector<string_view> split(string_view sv, string_view delimiters = ", "sv) {
 }
 } // namespace x
 
-int main() {
+using namespace x;
+
+int
+main()
+{
   ios_base::sync_with_stdio(false);
   cin.tie(nullptr);
 
