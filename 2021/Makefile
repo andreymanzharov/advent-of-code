@@ -3,7 +3,7 @@ CXXFLAGS += -O3
 # CXXFLAGS += -g
 CXXFLAGS += -Wall -Wextra -Wpedantic
 
-DAYS = a01 a02
+DAYS = a01 a02 a03
 
 .PHONY: clean
 
