@@ -69,11 +69,11 @@ main()
   }
 
   auto MostCommon = [&](auto index, auto first, auto last) {
-    long bits = 0;
-    for (auto it = first; it != last; ++it) {
-      bits += (*it)[index] == '1';
-    }
-    return 2 * bits >= distance(first, last) ? '1' : '0';
+    return 2 * count_if(
+                 first, last, [&](const auto& s) { return s[index] == '1'; }) >=
+               distance(first, last)
+             ? '1'
+             : '0';
   };
 
   auto first = v.begin();
@@ -97,10 +97,10 @@ main()
 
   {
     auto Rating = [&](auto first, auto last, auto comp) {
-      for (size_t i = 0; next(first) != last; ++i) {
-        auto x = MostCommon(i, first, last);
-        last =
-          partition(first, last, [&](const auto& s) { return comp(s[i], x); });
+      for (size_t index = 0; next(first) != last; ++index) {
+        auto x = MostCommon(index, first, last);
+        last = partition(
+          first, last, [&](const auto& s) { return comp(s[index], x); });
       }
       int result{};
       from_chars(first->data(), first->data() + first->size(), result, 2);
