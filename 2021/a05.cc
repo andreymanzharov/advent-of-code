@@ -75,8 +75,8 @@ main()
     for (const auto& [x1, y1, x2, y2] : a) {
       if (!diagonal && x1 != x2 && y1 != y2)
         continue;
-      int dx = x1 == x2 ? 0 : (x2 - x1) / abs(x2 - x1);
-      int dy = y1 == y2 ? 0 : (y2 - y1) / abs(y2 - y1);
+      int dx = (x1 < x2) - (x1 > x2);
+      int dy = (y1 < y2) - (y1 > y2);
       for (int x = x1, y = y1; x != x2 + dx || y != y2 + dy; x += dx, y += dy) {
         int& c = g[{ x, y }];
         if (c++ == 1) {
