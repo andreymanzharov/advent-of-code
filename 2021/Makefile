@@ -1,7 +1,6 @@
-CXXFLAGS = -std=c++2b
+CXXFLAGS = $(shell cat compile_flags.txt)
 CXXFLAGS += -O3
 # CXXFLAGS += -g
-CXXFLAGS += -Wall -Wextra -Wpedantic
 
 DAYS = a01 a02 a03 a04 a05 a06 a07
 
