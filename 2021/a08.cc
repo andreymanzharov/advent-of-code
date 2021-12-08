@@ -104,7 +104,7 @@ main()
       vector<char> a(7, '.');
       iota(a.begin(), a.end(), 'a');
 
-      map<string, int> c;
+      unordered_map<string, int> c;
       do {
         array<string, 10> b{
           string{ a[0], a[1], a[2], a[4], a[5], a[6] },
@@ -119,7 +119,7 @@ main()
           { a[0], a[1], a[2], a[3], a[5], a[6] },
         };
 
-        map<string, int> d;
+        unordered_map<string, int> d;
         for (auto i = 0uz; i < b.size(); ++i) {
           sort(b[i].begin(), b[i].end());
           d.emplace(move(b[i]), i);
