@@ -189,5 +189,5 @@ main()
   cout << a << endl;
   cout << b << endl;
 
-  return b;
+  return 0;
 }
