@@ -73,21 +73,6 @@ split(string_view sv, string_view delimiters = ", "sv)
 
 using namespace x;
 
-struct A
-{
-  virtual void m1() { cout << "A" << endl; }
-};
-
-struct B : A
-{
-  void m1() override { cout << "B" << endl; }
-};
-
-struct C : A
-{
-  void m1() { cout << "C" << endl; }
-};
-
 int
 main()
 {
