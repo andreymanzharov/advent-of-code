@@ -74,126 +74,179 @@ split(string_view sv, string_view delimiters = ", "sv)
 
 using namespace x;
 
+class Number
+{
+  vector<tuple<optional<int>, size_t, size_t>> tree;
+  size_t root;
+
+  bool Explode()
+  {
+    bool exploded = false;
+    optional<size_t> prev;
+    optional<int> next;
+    function<void(size_t, int)> explode = [&](size_t v, int d) {
+      auto& [value, left, right] = tree[v];
+      if (exploded) {
+        if (!next)
+          return;
+        if (value) {
+          *value += *next;
+          next.reset();
+        } else {
+          explode(left, d + 1);
+          explode(right, d + 1);
+        }
+        return;
+      }
+      if (value && !exploded) {
+        prev = v;
+        return;
+      }
+      if (d < 4 || exploded) {
+        explode(left, d + 1);
+        explode(right, d + 1);
+        return;
+      }
+      exploded = true;
+      if (prev) {
+        auto& prev_value = get<0>(tree[*prev]);
+        *prev_value += *get<0>(tree[left]);
+      }
+      next = *get<0>(tree[right]);
+      value = 0;
+      left = right = 0;
+    };
+    explode(root, 0);
+    return exploded;
+  }
+
+  bool Split()
+  {
+    function<bool(int)> split = [&](size_t v) {
+      auto& [value, left, right] = tree[v];
+      if (!value)
+        return split(left) || split(right);
+      if (*value < 10)
+        return false;
+      tree.emplace_back(*value / 2, 0, 0);
+      tree.emplace_back(*value - *value / 2, 0, 0);
+      value.reset();
+      left = tree.size() - 2;
+      right = tree.size() - 1;
+      return true;
+    };
+    return split(root);
+  }
+
+  void Reduce()
+  {
+    while (true) {
+      if (Explode()) {
+        continue;
+      }
+      if (Split())
+        continue;
+      return;
+    }
+  }
+
+public:
+  Number(string_view sv)
+  {
+    auto it = sv.begin();
+    function<size_t()> Parse = [&]() {
+      if (*it == '[') {
+        ++it;
+        auto left = Parse();
+        ++it;
+        auto right = Parse();
+        ++it;
+        tree.emplace_back(nullopt, left, right);
+      } else {
+        tree.emplace_back(*it - '0', 0, 0);
+        ++it;
+      }
+      return tree.size() - 1;
+    };
+    root = Parse();
+    assert(it == sv.end());
+  }
+
+  Number& operator+=(const Number& rhs)
+  {
+    auto offset = tree.size();
+    for (auto [value, left, right] : rhs.tree) {
+      tree.emplace_back(value, left + offset, right + offset);
+    }
+    tree.emplace_back(nullopt, root, rhs.root + offset);
+    root = tree.size() - 1;
+    Reduce();
+    return *this;
+  }
+
+  int Magnitude() const
+  {
+    function<int(size_t)> magnitude = [&](size_t v) {
+      const auto& [value, left, right] = tree[v];
+      return value ? *value : 3 * magnitude(left) + 2 * magnitude(right);
+    };
+    return magnitude(root);
+  }
+
+  friend ostream& operator<<(ostream& out, const Number& n)
+  {
+    function<void(size_t)> print = [&](size_t v) {
+      const auto& [value, left, right] = n.tree[v];
+      if (value)
+        out << *value;
+      else {
+        out << '[';
+        print(left);
+        out << ',';
+        print(right);
+        out << ']';
+      }
+    };
+    print(n.root);
+    return out;
+  }
+};
+
+Number
+operator+(const Number& lhs, const Number& rhs)
+{
+  Number result{ lhs };
+  result += rhs;
+  return result;
+}
+
 int
 main()
 {
   ios_base::sync_with_stdio(false);
   cin.tie(nullptr);
 
-  auto Parse = [](string_view s) {
-    vector<int> v;
-    for (char c : s) {
-      if ('0' <= c && c <= '9') {
-        v.push_back(c - '0');
-      } else if (c == '[') {
-        v.push_back(-1);
-      } else if (c == ']') {
-        v.push_back(-2);
-      }
-    }
-    return v;
-  };
-
-  auto Reduce = [](const vector<int>& v) {
-    vector<int> r;
-    int nested = 0;
-    for (auto it = v.begin(); it != v.end(); ++it) {
-      if (*it == -1)
-        nested++;
-      else if (*it == -2)
-        nested--;
-      if (nested > 4) {
-        int left = *(it + 1);
-        int right = *(it + 2);
-        auto to_left = r.rbegin();
-        while (to_left != r.rend() && (*to_left == -1 || *to_left == -2))
-          ++to_left;
-        if (to_left != r.rend()) {
-          *to_left += left;
-        }
-        r.push_back(0);
-        it = it + 4;
-        while (it != v.end() && (*it == -1 || *it == -2)) {
-          r.push_back(*it++);
-        }
-        if (it != v.end()) {
-          r.push_back(*it + right);
-          while (++it != v.end()) {
-            r.push_back(*it);
-          }
-        }
-        return pair{ r, true };
-      }
-      r.push_back(*it);
-    }
-    r.clear();
-    for (auto it = v.begin(); it != v.end(); ++it) {
-      if (*it >= 10) {
-        r.push_back(-1);
-        r.push_back(*it / 2);
-        r.push_back(*it - *it / 2);
-        r.push_back(-2);
-        while (++it != v.end()) {
-          r.push_back(*it);
-        }
-        return pair{ r, true };
-      }
-      r.push_back(*it);
-    }
-    return pair{ r, false };
-  };
-
-  auto Sum = [&](const vector<int>& v1, const vector<int>& v2) {
-    vector<int> v;
-    v.reserve(2 + v1.size() + v2.size());
-    v.push_back(-1);
-    v.insert(v.end(), v1.begin(), v1.end());
-    v.insert(v.end(), v2.begin(), v2.end());
-    v.push_back(-2);
-    while (true) {
-      auto [r, f] = Reduce(v);
-      if (!f)
-        return r;
-      v = move(r);
-    }
-  };
-
-  function<pair<int, vector<int>::const_iterator>(vector<int>::const_iterator)>
-    Magnitude = [&](vector<int>::const_iterator it) {
-      if (*it == -1) {
-        auto [l, il] = Magnitude(it + 1);
-        auto [r, ir] = Magnitude(il);
-        return pair{ 3 * l + 2 * r, ir + 1 };
-      } else {
-        return pair{ *it, it + 1 };
-      }
-    };
-
-  vector<vector<int>> vs;
+  vector<Number> ns;
 
   string line;
   while (getline(cin, line)) {
-    vs.emplace_back(Parse(line));
+    ns.emplace_back(line);
   }
 
-  vector<int>& v{ vs.front() };
-  for (auto i = 1uz; i < vs.size(); ++i) {
-    v = Sum(v, vs[i]);
+  Number n{ ns.front() };
+  for (auto i = 1uz; i < ns.size(); ++i) {
+    n += ns[i];
   }
+  cout << n.Magnitude() << endl;
 
-  auto [a, it] = Magnitude(v.begin());
-  assert(it == v.end());
-
-  cout << a << endl;
-
-  auto b = numeric_limits<int>::min();
-  for (auto i = 0uz; i < vs.size(); ++i)
-    for (auto j = 0uz; j < vs.size(); ++j)
-      if (i != j) {
-        auto [m, _] = Magnitude(Sum(vs[i], vs[j]).begin());
-        b = max(b, m);
-      }
-  cout << b << endl;
-
+  auto max_magnitude = numeric_limits<int>::min();
+  for (auto i = ns.begin(); i != ns.end(); ++i) {
+    for (auto j = ns.begin(); j != ns.end(); ++j) {
+      if (i == j)
+        continue;
+      max_magnitude = max(max_magnitude, (*i + *j).Magnitude());
+    }
+  }
+  cout << max_magnitude << endl;
   return 0;
 }
