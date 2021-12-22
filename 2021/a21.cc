@@ -80,12 +80,14 @@ main()
   ios_base::sync_with_stdio(false);
   cin.tie(nullptr);
 
+  struct Player
+  {
+    int n, p;
+  };
+
   struct State
   {
-    struct
-    {
-      int n, p;
-    } p1, p2;
+    Player p1, p2;
     bool first;
 
     bool operator<(const State& other) const
@@ -96,32 +98,36 @@ main()
     }
   };
 
-  map<State, pair<long, long>> d;
-  function<pair<long, long>(State)> Rec = [&](State s) {
+  auto Step = [](auto s, int x) {
+    auto t{ s };
+    if (s.first) {
+      t.p1.p = (t.p1.p + x - 1) % 10 + 1;
+      t.p1.n += t.p1.p;
+    } else {
+      t.p2.p = (t.p2.p + x - 1) % 10 + 1;
+      t.p2.n += t.p2.p;
+    }
+    t.first = !s.first;
+    return t;
+  };
+
+  map<State, pair<int64_t, int64_t>> d;
+  function<pair<int64_t, int64_t>(State)> WinCount = [&](State s) {
     if (s.p1.n >= 21)
-      return pair{ 1l, 0l };
+      return pair{ 1ll, 0ll };
     if (s.p2.n >= 21)
-      return pair{ 0l, 1l };
-    pair<long, long> r{ 0, 0 };
+      return pair{ 0ll, 1ll };
+    pair<int64_t, int64_t> r{ 0, 0 };
     for (int a = 1; a <= 3; ++a) {
       for (int b = 1; b <= 3; ++b) {
         for (int c = 1; c <= 3; ++c) {
-          auto x = a + b + c;
-          auto t{ s };
-          if (s.first) {
-            t.p1.p = (t.p1.p + x - 1) % 10 + 1;
-            t.p1.n += t.p1.p;
-          } else {
-            t.p2.p = (t.p2.p + x - 1) % 10 + 1;
-            t.p2.n += t.p2.p;
-          }
-          t.first = !s.first;
-          long w1, w2;
+          auto t = Step(s, a + b + c);
+          int64_t w1, w2;
           if (auto it = d.find(t); it != d.end()) {
             w1 = it->second.first;
             w2 = it->second.second;
           } else {
-            auto p = Rec(t);
+            auto p = WinCount(t);
             d.emplace(t, p);
             w1 = p.first;
             w2 = p.second;
@@ -134,7 +140,29 @@ main()
     return r;
   };
 
-  auto [w1, w2] = Rec({ { 0, 9 }, { 0, 3 }, true });
+  array<Player, 2> players;
+
+  string line;
+  while (getline(cin, line)) {
+    auto w = split<string_view>(line);
+    players[to<size_t>(w[1]) - 1] = Player{ .n = 0, .p = to<int>(w[4]) };
+  }
+
+  State s{ players[0], players[1], true };
+  int i{ 0 };
+  for (int d = 1; s.p1.n < 1000 && s.p2.n < 1000;) {
+    int x{ 0 };
+    for (int k{ 0 }; k < 3; ++k) {
+      x += d;
+      ++i;
+      if (++d > 100)
+        d = 1;
+    }
+    s = Step(s, x);
+  }
+  cout << i * min(s.p1.n, s.p2.n) << endl;
+
+  auto [w1, w2] = WinCount({ players[0], players[1], true });
 
   cout << max(w1, w2) << endl;
 
