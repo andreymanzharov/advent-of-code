@@ -114,21 +114,21 @@ main()
         Range my{ max(cube.y.lo, y.lo), min(cube.y.hi, y.hi) };
         Range mz{ max(cube.z.lo, z.lo), min(cube.z.hi, z.hi) };
         if (cube.x.lo < mx.lo)
-          next.emplace_back(Range{ cube.x.lo, mx.lo - 1 }, cube.y, cube.z);
+          next.push_back({ Range{ cube.x.lo, mx.lo - 1 }, cube.y, cube.z });
         if (mx.hi < cube.x.hi)
-          next.emplace_back(Range{ mx.hi + 1, cube.x.hi }, cube.y, cube.z);
+          next.push_back({ Range{ mx.hi + 1, cube.x.hi }, cube.y, cube.z });
         if (cube.y.lo < my.lo)
-          next.emplace_back(mx, Range{ cube.y.lo, my.lo - 1 }, cube.z);
+          next.push_back({ mx, Range{ cube.y.lo, my.lo - 1 }, cube.z });
         if (my.hi < cube.y.hi)
-          next.emplace_back(mx, Range{ my.hi + 1, cube.y.hi }, cube.z);
+          next.push_back({ mx, Range{ my.hi + 1, cube.y.hi }, cube.z });
         if (cube.z.lo < mz.lo)
-          next.emplace_back(mx, my, Range{ cube.z.lo, mz.lo - 1 });
+          next.push_back({ mx, my, Range{ cube.z.lo, mz.lo - 1 } });
         if (mz.hi < cube.z.hi)
-          next.emplace_back(mx, my, Range{ mz.hi + 1, cube.z.hi });
+          next.push_back({ mx, my, Range{ mz.hi + 1, cube.z.hi } });
       }
     }
     if (on) {
-      next.emplace_back(x, y, z);
+      next.push_back({ x, y, z });
     }
     cubes = move(next);
   }
@@ -142,9 +142,9 @@ main()
     if (cube.x.lo > 50 || cube.x.hi < -50 || cube.y.lo > 50 ||
         cube.y.hi < -50 || cube.z.lo > 50 || cube.z.hi < -50)
       return int64_t{};
-    return (max(-50l, cube.x.hi) - min(50l, cube.x.lo) + 1) *
-           (max(-50l, cube.y.hi) - min(50l, cube.y.lo) + 1) *
-           (max(-50l, cube.z.hi) - min(50l, cube.z.lo) + 1);
+    return (max(-50ll, cube.x.hi) - min(50ll, cube.x.lo) + 1) *
+           (max(-50ll, cube.y.hi) - min(50ll, cube.y.lo) + 1) *
+           (max(-50ll, cube.z.hi) - min(50ll, cube.z.lo) + 1);
   };
 
   auto VolumeB = [](const auto& cube) {
