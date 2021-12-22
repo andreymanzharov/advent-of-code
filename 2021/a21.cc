@@ -84,7 +84,7 @@ main()
   {
     struct
     {
-      int p, n;
+      int n, p;
     } p1, p2;
     bool first;
 
