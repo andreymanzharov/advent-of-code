@@ -82,7 +82,7 @@ main()
 
   struct Range
   {
-    int64_t lo, hi;
+    long lo, hi;
   };
 
   struct Cube
@@ -101,9 +101,9 @@ main()
   while (getline(cin, line)) {
     auto w = split<string_view>(line, " =.,"sv);
     bool on = w[0] == "on";
-    Range x{ to<int64_t>(w[2]), to<int64_t>(w[3]) };
-    Range y{ to<int64_t>(w[5]), to<int64_t>(w[6]) };
-    Range z{ to<int64_t>(w[8]), to<int64_t>(w[9]) };
+    Range x{ to<long>(w[2]), to<long>(w[3]) };
+    Range y{ to<long>(w[5]), to<long>(w[6]) };
+    Range z{ to<long>(w[8]), to<long>(w[9]) };
 
     vector<Cube> next;
     for (const auto& cube : cubes) {
@@ -135,16 +135,17 @@ main()
 
   auto Count = [&](auto volume) {
     return transform_reduce(
-      cubes.begin(), cubes.end(), int64_t{}, plus<int64_t>(), volume);
+      cubes.begin(), cubes.end(), 0L, plus<long>(), volume);
   };
 
   auto VolumeA = [](const auto& cube) {
     if (cube.x.lo > 50 || cube.x.hi < -50 || cube.y.lo > 50 ||
         cube.y.hi < -50 || cube.z.lo > 50 || cube.z.hi < -50)
-      return int64_t{};
-    return (max(-50ll, cube.x.hi) - min(50ll, cube.x.lo) + 1) *
-           (max(-50ll, cube.y.hi) - min(50ll, cube.y.lo) + 1) *
-           (max(-50ll, cube.z.hi) - min(50ll, cube.z.lo) + 1);
+      return 0L;
+    constexpr long region{ 50 };
+    return (max(-region, cube.x.hi) - min(region, cube.x.lo) + 1) *
+           (max(-region, cube.y.hi) - min(region, cube.y.lo) + 1) *
+           (max(-region, cube.z.hi) - min(region, cube.z.lo) + 1);
   };
 
   auto VolumeB = [](const auto& cube) {

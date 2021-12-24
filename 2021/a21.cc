@@ -111,18 +111,18 @@ main()
     return t;
   };
 
-  map<State, pair<int64_t, int64_t>> d;
-  function<pair<int64_t, int64_t>(State)> WinCount = [&](State s) {
+  map<State, pair<long, long>> d;
+  function<pair<long, long>(State)> WinCount = [&](State s) {
     if (s.p1.n >= 21)
-      return pair{ 1ll, 0ll };
+      return pair{ 1L, 0L };
     if (s.p2.n >= 21)
-      return pair{ 0ll, 1ll };
-    pair<int64_t, int64_t> r{ 0, 0 };
+      return pair{ 0L, 1L };
+    pair<long, long> r{ 0, 0 };
     for (int a = 1; a <= 3; ++a) {
       for (int b = 1; b <= 3; ++b) {
         for (int c = 1; c <= 3; ++c) {
           auto t = Step(s, a + b + c);
-          int64_t w1, w2;
+          long w1, w2;
           if (auto it = d.find(t); it != d.end()) {
             w1 = it->second.first;
             w2 = it->second.second;
