@@ -81,7 +81,7 @@ main()
   cin.tie(nullptr);
 
   set<pair<int, int>> g;
-  map<pair<int, int>, char> p;
+  map<pair<int, int>, char, greater<pair<int, int>>> p;
 
   string line;
   for (int r{ 0 }; getline(cin, line); ++r) {
@@ -93,12 +93,13 @@ main()
     }
   }
 
-  using State = tuple<int, map<pair<int, int>, char>>;
+  using State =
+    tuple<int, int, map<pair<int, int>, char, greater<pair<int, int>>>>;
 
-  set<map<pair<int, int>, char>> s;
+  map<map<pair<int, int>, char, greater<pair<int, int>>>, int> s;
 
   auto Organized = [](const auto& amphipods) {
-    for (int r = 2; r <= 3; ++r) {
+    for (int r = 2; r <= 5; ++r) {
       for (int a = 'A'; a <= 'D'; ++a) {
         int c = 3 + (a - 'A') * 2;
         if (auto it = amphipods.find({ r, c });
@@ -110,13 +111,13 @@ main()
   };
 
   priority_queue<State, vector<State>, greater<State>> q;
-  // queue<State> q;
-  q.emplace(0, p);
+  q.emplace(0, 0, p);
 
   constexpr array<int, 4> energies{ 1, 10, 100, 1000 };
 
-  auto Move = [&](int energy, const auto& amphipods, int r, int c) {
-    auto move_energy = energies[amphipods.at({ r, c }) - 'A'];
+  auto Move = [&](int energy, const auto& amphipods, int r, int c, int k) {
+    auto a = amphipods.at({ r, c });
+    auto move_energy = energies[a - 'A'];
 
     int mnc = c;
     while (!g.contains({ 1, mnc - 1 }) && !amphipods.contains({ 1, mnc - 1 }))
@@ -125,7 +126,12 @@ main()
     while (!g.contains({ 1, mxc + 1 }) && !amphipods.contains({ 1, mxc + 1 }))
       mxc++;
 
-    if ((r == 3 && !amphipods.contains({ r - 1, c })) || r == 2) {
+    if ((r == 5 && !amphipods.contains({ r - 1, c }) &&
+         !amphipods.contains({ r - 2, c }) &&
+         !amphipods.contains({ r - 3, c })) ||
+        (r == 4 && !amphipods.contains({ r - 1, c }) &&
+         !amphipods.contains({ r - 2, c })) ||
+        (r == 3 && !amphipods.contains({ r - 1, c })) || r == 2) {
       int nr = 1;
       for (int nc = mnc; nc <= mxc; ++nc) {
         if (!g.contains({ nr + 1, nc }))
@@ -134,62 +140,62 @@ main()
         auto node = next_amphipods.extract({ r, c });
         node.key() = { nr, nc };
         next_amphipods.insert(move(node));
-        // if (auto [it, f] = s.insert(next_amphipods); f) {
-        q.emplace(energy + move_energy * (abs(r - nr) + abs(c - nc)),
-                  move(next_amphipods));
-        // }
+        auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
+        q.emplace(k + 1, e, move(next_amphipods));
       }
     } else if (r == 1) {
-      if (energy == 12519 && r == 1 && c == 2) {
-        dbg(energy);
-      }
       for (int nc = mnc; nc <= mxc; ++nc) {
-        // if (g.contains({ r + 1, nc }))
-        //   continue;
-        int nr = r + 1;
-        if (!amphipods.contains({ nr, nc })) {
+        if (g.contains({ r + 1, nc }))
+          continue;
+        int nr = r + 4;
+        bool f = nc == 3 + (a - 'A') * 2,
+             r2 = amphipods.contains({ r + 1, nc }),
+             r3 = amphipods.contains({ r + 2, nc }),
+             r4 = amphipods.contains({ r + 3, nc }),
+             r5 = amphipods.contains({ r + 4, nc });
+        if (f && !r5 && !r4 && !r3 && !r2) {
           auto next_amphipods = amphipods;
           auto node = next_amphipods.extract({ r, c });
           node.key() = { nr, nc };
           next_amphipods.insert(move(node));
-          // if (auto [it, f] = s.insert(next_amphipods); f) {
-          q.emplace(energy + move_energy * (abs(r - nr) + abs(c - nc)),
-                    move(next_amphipods));
-          // }
-          nr++;
-          if (!amphipods.contains({ nr, nc })) {
-            auto next_amphipods = amphipods;
-            auto node = next_amphipods.extract({ r, c });
-            node.key() = { nr, nc };
-            next_amphipods.insert(move(node));
-            // if (auto [it, f] = s.insert(next_amphipods); f) {
-            q.emplace(energy + move_energy * (abs(r - nr) + abs(c - nc)),
-                      move(next_amphipods));
-            // }
-          }
+          auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
+          q.emplace(k + 1, e, move(next_amphipods));
+        }
+        nr--;
+        if (f && r5 && !r4 && !r3 && !r2) {
+          auto next_amphipods = amphipods;
+          auto node = next_amphipods.extract({ r, c });
+          node.key() = { nr, nc };
+          next_amphipods.insert(move(node));
+          auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
+          q.emplace(k + 1, e, move(next_amphipods));
+        }
+        nr--;
+        if (f && r5 && r4 && !r3 && !r2) {
+          auto next_amphipods = amphipods;
+          auto node = next_amphipods.extract({ r, c });
+          node.key() = { nr, nc };
+          next_amphipods.insert(move(node));
+          auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
+          q.emplace(k + 1, e, move(next_amphipods));
+        }
+        nr--;
+        if (f && r5 && r4 && r3 && !r2) {
+          auto next_amphipods = amphipods;
+          auto node = next_amphipods.extract({ r, c });
+          node.key() = { nr, nc };
+          next_amphipods.insert(move(node));
+          auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
+          q.emplace(k + 1, e, move(next_amphipods));
         }
       }
     }
   };
 
   while (!q.empty()) {
-    const auto [energy, amphipods] = q.top();
-    // dbg(energy, s.size(), q.size());
-    // for (int r = 0; r < 5; ++r) {
-    //   for (int c = 0; c < 13; ++c) {
-    //     if (auto it = amphipods.find({ r, c }); it != amphipods.end()) {
-    //       cout << it->second;
-    //     } else if (g.contains({ r, c })) {
-    //       cout << '#';
-    //     } else {
-    //       cout << '.';
-    //     }
-    //   }
-    //   cout << '\n';
-    // }
-    // cout << energy << endl;
+    const auto [k, energy, amphipods] = q.top();
     q.pop();
-    if (auto [it, f] = s.insert(amphipods); !f) {
+    if (auto [it, f] = s.emplace(amphipods, energy); !f) {
       continue;
     }
 
@@ -199,13 +205,18 @@ main()
     }
     for (auto [p, a] : amphipods) {
       auto [r, c] = p;
-      if (c == 3 + (a - 'A') * 2 && r == 3)
-        continue;
-      if (c == 3 + (a - 'A') * 2 && r == 2)
-        if (auto it = amphipods.find({ r + 1, c });
-            it != amphipods.end() && it->second == a)
+      if (c == 3 + (a - 'A') * 2 && r > 1) {
+        bool f = true;
+        for (int nr = r; f && nr <= 5; ++nr) {
+          if (auto it = amphipods.find({ nr, c });
+              it == amphipods.end() || it->second != a)
+            f = false;
+        }
+        if (f)
           continue;
-      Move(energy, amphipods, r, c);
+      }
+
+      Move(energy, amphipods, r, c, k);
     }
   }
 
