@@ -122,13 +122,13 @@ main()
         unordered_map<string, int> d;
         for (auto i = 0uz; i < b.size(); ++i) {
           sort(b[i].begin(), b[i].end());
-          d.emplace(move(b[i]), i);
+          d.emplace(std::move(b[i]), i);
         }
 
         if (all_of(w.begin(), w.end(), [&](const auto& s) {
               return d.contains(s);
             })) {
-          c = move(d);
+          c = std::move(d);
           break;
         }
       } while (next_permutation(a.begin(), a.end()));

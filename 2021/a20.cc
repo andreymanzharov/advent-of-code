@@ -120,7 +120,7 @@ main()
 
   bool outside = false;
   for (int k = 1; k <= 50; ++k) {
-    g = Apply(move(g), k, outside);
+    g = Apply(std::move(g), k, outside);
     outside = outside ? s[(1 << 9) - 1] == '#' : s[0] == '#';
 
     if (k == 2 || k == 50) {

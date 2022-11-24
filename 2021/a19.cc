@@ -108,10 +108,10 @@ main()
           r180.push_back({ -p[a[0]], -p[a[1]], k * p[a[2]] });
           r270.push_back({ -p[a[1]], p[a[0]], k * p[a[2]] });
         }
-        r.push_back(move(r0));
-        r.push_back(move(r90));
-        r.push_back(move(r180));
-        r.push_back(move(r270));
+        r.push_back(std::move(r0));
+        r.push_back(std::move(r90));
+        r.push_back(std::move(r180));
+        r.push_back(std::move(r270));
       }
     } while (next_permutation(a.begin(), a.end()));
     return r;
@@ -128,7 +128,7 @@ main()
 
   queue<size_t> q;
   scanners[0] = { .pos = array{ 0, 0, 0 },
-                  .beacons = move(initial[0]),
+                  .beacons = std::move(initial[0]),
                   .detected = true };
   q.push(0);
 

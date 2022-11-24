@@ -130,7 +130,7 @@ main()
     if (on) {
       next.push_back({ x, y, z });
     }
-    cubes = move(next);
+    cubes = std::move(next);
   }
 
   auto Count = [&](auto volume) {

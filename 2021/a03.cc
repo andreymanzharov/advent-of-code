@@ -65,7 +65,7 @@ main()
   vector<string> v;
   string line;
   while (getline(cin, line)) {
-    v.push_back(move(line));
+    v.push_back(std::move(line));
   }
 
   auto MostCommon = [&](auto index, auto first, auto last) {

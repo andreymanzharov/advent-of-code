@@ -117,8 +117,8 @@ main()
   while (moved) {
     ++step;
     moved = false;
-    east = Move(move(east), south, 0, 1);
-    south = Move(move(south), east, 1, 0);
+    east = Move(std::move(east), south, 0, 1);
+    south = Move(std::move(south), east, 1, 0);
   }
 
   cout << step << endl;

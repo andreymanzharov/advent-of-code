@@ -81,7 +81,7 @@ main()
 
   vector<string> g;
   for (string line; getline(cin, line);) {
-    g.push_back(move(line));
+    g.push_back(std::move(line));
   }
 
   const array<pair<int, int>, 4> d{

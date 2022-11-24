@@ -139,9 +139,9 @@ main()
         auto next_amphipods = amphipods;
         auto node = next_amphipods.extract({ r, c });
         node.key() = { nr, nc };
-        next_amphipods.insert(move(node));
+        next_amphipods.insert(std::move(node));
         auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
-        q.emplace(k + 1, e, move(next_amphipods));
+        q.emplace(k + 1, e, std::move(next_amphipods));
       }
     } else if (r == 1) {
       for (int nc = mnc; nc <= mxc; ++nc) {
@@ -157,36 +157,36 @@ main()
           auto next_amphipods = amphipods;
           auto node = next_amphipods.extract({ r, c });
           node.key() = { nr, nc };
-          next_amphipods.insert(move(node));
+          next_amphipods.insert(std::move(node));
           auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
-          q.emplace(k + 1, e, move(next_amphipods));
+          q.emplace(k + 1, e, std::move(next_amphipods));
         }
         nr--;
         if (f && r5 && !r4 && !r3 && !r2) {
           auto next_amphipods = amphipods;
           auto node = next_amphipods.extract({ r, c });
           node.key() = { nr, nc };
-          next_amphipods.insert(move(node));
+          next_amphipods.insert(std::move(node));
           auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
-          q.emplace(k + 1, e, move(next_amphipods));
+          q.emplace(k + 1, e, std::move(next_amphipods));
         }
         nr--;
         if (f && r5 && r4 && !r3 && !r2) {
           auto next_amphipods = amphipods;
           auto node = next_amphipods.extract({ r, c });
           node.key() = { nr, nc };
-          next_amphipods.insert(move(node));
+          next_amphipods.insert(std::move(node));
           auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
-          q.emplace(k + 1, e, move(next_amphipods));
+          q.emplace(k + 1, e, std::move(next_amphipods));
         }
         nr--;
         if (f && r5 && r4 && r3 && !r2) {
           auto next_amphipods = amphipods;
           auto node = next_amphipods.extract({ r, c });
           node.key() = { nr, nc };
-          next_amphipods.insert(move(node));
+          next_amphipods.insert(std::move(node));
           auto e = energy + move_energy * (abs(r - nr) + abs(c - nc));
-          q.emplace(k + 1, e, move(next_amphipods));
+          q.emplace(k + 1, e, std::move(next_amphipods));
         }
       }
     }

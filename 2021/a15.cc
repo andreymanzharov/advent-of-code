@@ -83,7 +83,7 @@ main()
 
   string line;
   while (getline(cin, line)) {
-    g.push_back(move(line));
+    g.push_back(std::move(line));
   }
   int n = g.size();
   int m = g[0].size();
