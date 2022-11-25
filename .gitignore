@@ -1,2 +1,4 @@
 a??
 *.txt
+!compile_flags.txt
+*.dSym
