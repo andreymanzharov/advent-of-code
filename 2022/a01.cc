@@ -81,5 +81,28 @@ main()
   ios_base::sync_with_stdio(false);
   cin.tie(nullptr);
 
+  int m1{}, m2{}, m3{};
+
+  string line;
+  while (getline(cin, line)) {
+    auto x = to<int>(line);
+    while (getline(cin, line) && !line.empty()) {
+      x += to<int>(line);
+    }
+    if (x > m1) {
+      m3 = m2;
+      m2 = m1;
+      m1 = x;
+    } else if (x > m2) {
+      m3 = m2;
+      m2 = x;
+    } else if (x > m3) {
+      m3 = x;
+    }
+  }
+
+  cout << m1 << endl;
+  cout << m1 + m2 + m3 << endl;
+
   return 0;
 }
