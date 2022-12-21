@@ -55,7 +55,7 @@ to(std::string_view from)
   return std::string{ from };
 }
 
-template<typename T>
+template<typename T = std::string_view>
 std::vector<T>
 split(std::string_view sv, std::string_view delimiters = ", ")
 {
