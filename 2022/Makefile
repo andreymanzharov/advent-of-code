@@ -5,7 +5,7 @@ CXXFLAGS += -O3 -g
 
 DAYS = a01 a02 a03 a04 a05 a06 a07 a08 \
        a17 a20 \
-       a21
+       a21 a22
 
 .PHONY: clean
 
