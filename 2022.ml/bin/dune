@@ -1,3 +1,0 @@
-(executables
- (names day01 day02)
- (libraries advent_of_code))
