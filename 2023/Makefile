@@ -1,16 +1,14 @@
-CXX = clang++
-CXXFLAGS += --stdlib=libc++
-CXXFLAGS += $(shell cat compile_flags.txt)
-CXXFLAGS += -O3 -g
+JAVA_OPTS = --source 21 --enable-preview -Djava.net.useSystemProxies=true
 
-DAYS = a01
+DAYS = 
 
 .PHONY: clean
 
-%.in:
-	curl -L --cookie "session=${AOC_SESSION}" https://adventofcode.com/2023/day/$(basename $@)/input | tee input.txt
-
 all: $(DAYS)
 
+a%: src/a%.java
+	$(JAVA_HOME)/bin/java $(JAVA_OPTS) $^
+
 clean:
-	rm -f $(DAYS)
+	rm -f $(DAYS:=.in)
+	rm -rf out/
