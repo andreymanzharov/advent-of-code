@@ -1,6 +1,6 @@
 JAVA_OPTS = --source 21 --enable-preview -Djava.net.useSystemProxies=true
 
-DAYS = a01
+DAYS = a01 a02
 
 .PHONY: clean
 
